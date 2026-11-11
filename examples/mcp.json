@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pob": {
+      "command": "pob-agent-bridge",
+      "args": ["--pob-dir", "C:/Games/Path of Building", "mcp"]
+    }
+  }
+}

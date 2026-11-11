@@ -1,0 +1,3 @@
+* text=auto eol=lf
+# Preserve the upstream wrapper verbatim, including its original whitespace.
+pob_bridge/vendor/HeadlessWrapper.lua -text whitespace=-blank-at-eol

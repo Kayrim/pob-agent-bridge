@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+runtime/
+settings.json
+.test-tmp/
+*.xml
+!examples/minimal.xml

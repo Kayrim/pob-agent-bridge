@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pob-agent-bridge"
+version = "0.1.0"
+description = "Local MCP server and CLI for Path of Building Community"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+classifiers = ["Operating System :: Microsoft :: Windows", "Programming Language :: Python :: 3", "Topic :: Games/Entertainment"]
+
+[project.scripts]
+pob-agent-bridge = "pob_bridge.cli:cli"
+
+[project.urls]
+Repository = "https://github.com/Kayrim/pob-agent-bridge"
+Issues = "https://github.com/Kayrim/pob-agent-bridge/issues"
+
+[tool.setuptools]
+license-files = ["LICENSE", "THIRD-PARTY-NOTICES.md"]
+
+[tool.setuptools.packages.find]
+include = ["pob_bridge*"]
+
+[tool.setuptools.package-data]
+pob_bridge = ["*.lua", "vendor/*.lua"]

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathOfBuilding>
+  <Build level="10" className="Ranger" ascendClassName="None" mainSocketGroup="1" targetVersion="3_0" characterLevelAutoMode="false"/>
+  <Skills activeSkillSet="1" defaultGemLevel="normalMaximum" defaultGemQuality="0">
+    <SkillSet id="1" title="Example">
+      <Skill enabled="true" mainActiveSkill="1" slot="None">
+        <Gem nameSpec="Fireball" level="1" quality="0" enabled="true"/>
+      </Skill>
+    </SkillSet>
+  </Skills>
+  <Items activeItemSet="1"><ItemSet id="1" title="Example"/></Items>
+  <Config/>
+</PathOfBuilding>
