@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2
+
+- Add Codex CLI registration, a copy-paste TOML configuration and real-connection
+  verification instructions.
+- Recommend normal user launch for live PoB. Document the save-folder failure
+  caused by inherited agent-sandbox restrictions and a backup-first recovery.
+- Record packaged-bridge verification through Codex and distinguish it from
+  isolated engine tests and portable CI. No calculation or tool behavior changed.
+
 ## 0.1.1
 
 - Canonicalize temporary test roots so Windows runner profiles with 8.3 short

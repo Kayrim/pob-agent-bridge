@@ -29,6 +29,8 @@ Do not expose this local stdio process over HTTP or attach it to an untrusted
 agent. Client-specific registration UI varies; the server command/arguments
 are the same. It advertises eight tools through `tools/list`.
 
+Codex users can follow [the Codex-specific walkthrough](CODEX.md).
+
 ## Suggested agent procedure
 
 1. Call `pob_health`. Resolve an invalid installation before attempting work.
@@ -40,6 +42,10 @@ are the same. It advertises eight tools through `tools/list`.
    IDs, not necessarily identical numbers. Return to `pob_status` after errors.
 6. Export to a new filename, and report the backup/export paths to the user.
 7. After a timeout use `pob_pending`; an unknown result is not a failed mutation.
+
+Open the live GUI through the user's normal shortcut. Starting it as a child of
+a sandboxed agent can prevent saving to Documents. `launch --keep-alive` addresses
+process lifetime, not file permissions. Preserve unsaved work before any restart.
 
 Example isolated tool arguments:
 

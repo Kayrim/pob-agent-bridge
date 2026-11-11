@@ -69,6 +69,8 @@ use the absolute Python path with `"args": ["-m", "pob_bridge", "--pob-dir", ...
 client after changing its configuration. See [the integration guide](docs/AGENT-INTEGRATION.md)
 and [ready-to-edit config](examples/mcp.json).
 
+For Codex, see [Codex setup](docs/CODEX.md) and the [TOML example](examples/codex.toml).
+
 Try this prompt:
 
 > Use the PoB tools. Start with pob_health, then calculate builds/example.xml.
@@ -99,12 +101,12 @@ your agent can prepare XML with its ordinary file tools and calculate/load it.
 
 ## Optional live-window control
 
-Close PoB normally first so your unsaved work is preserved. Then install the
-removable hook and reopen PoB:
+Close PoB normally first so your unsaved work is preserved. Install the removable
+hook, then **open PoB using your normal Windows shortcut**:
 
 ```powershell
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" install
-pob-agent-bridge --pob-dir "C:/Games/Path of Building" launch
+# Open PoB normally, keep its window active, then run:
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" status
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" load builds/example.xml
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" select --tree 1 --skills 1 --items 1 --config-set 1 --view CALCS
@@ -129,8 +131,21 @@ pob-agent-bridge --pob-dir "C:/Games/Path of Building" uninstall
 ```
 
 Restart PoB afterward. Backups remain; uninstall removes only this exact hook.
-If your agent shell cleans up child processes, `launch --keep-alive` keeps its
-launcher attached until you close PoB normally.
+The optional `launch` command inherits the caller's process restrictions. **If an
+AI agent launches PoB inside its sandbox, PoB may be unable to save to Documents**
+even though your Windows account can write there. Open the GUI normally; reserve
+`pob_calculate` for unattended work. `launch --keep-alive` only prevents child-process
+cleanup; it does not remove sandbox restrictions or grant file access.
+
+### Cannot save the build file
+
+If PoB reports that the save folder is not writable, first check its displayed
+path. If the app was launched by a sandboxed agent, preserve the open build with
+`pob_export` to a **new XML path inside the PoB directory**, verify the export,
+then close PoB normally and reopen it using your usual Windows shortcut. Restore
+the exported build and save again. Keep the backup until saving is confirmed.
+Do not discard the only copy of unsaved work, change folder permissions blindly,
+or assume this error always has the same cause.
 
 ## Timeouts and local access
 
@@ -174,8 +189,11 @@ The suite covers reversible installation, refusal of unknown hooks, path escapes
 argument validation, pending-request preservation, protocol/error responses and,
 when enabled, a real native calculation plus an invalid-tree error over MCP,
 and load/select/config/export handlers exercised against isolated native objects.
-The original live bridge was exercised locally; the packaged GUI variant still
-needs wider community testing. Do not use calculated max hit as a survival guarantee.
+The packaged bridge was also verified through Codex's actual MCP client: eight
+tools discovered, native calculation, live status, set selection and export.
+Normal PoB saving was confirmed after reopening the GUI normally. See
+[verification details](docs/VERIFICATION.md). Wider version/build compatibility
+still needs community testing. Do not use calculated max hit as a survival guarantee.
 
 ## Contributing
 
