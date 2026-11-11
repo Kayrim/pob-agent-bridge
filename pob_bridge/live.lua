@@ -43,7 +43,7 @@ local function build()
     return main.modes.BUILD
 end
 local function snapshot()
-    local r={bridgeVersion="0.1.0",pid=pid,pobVersion=launch.versionNumber,latestTreeVersion=latestTreeVersion,mode=main.mode,modalCount=#main.popups}
+    local r={bridgeVersion="0.1.1",pid=pid,pobVersion=launch.versionNumber,latestTreeVersion=latestTreeVersion,mode=main.mode,modalCount=#main.popups}
     if main.mode~="BUILD" or not main.modes.BUILD.calcsTab then return r end
     local b=build()
     r.name=b.buildName;r.file=b.dbFileName;r.unsaved=not not b.unsaved;r.view=b.viewMode
@@ -129,7 +129,7 @@ function bridge:tick()
     local now=GetTime()
     if now-self.heartbeatAt>=1000 then
         self.heartbeatAt=now
-        write(base.."heartbeat.json",assert(json.encode({pid=pid,version="0.1.0",time=os.time()})))
+        write(base.."heartbeat.json",assert(json.encode({pid=pid,version="0.1.1",time=os.time()})))
     end
     if self.pending then
         self.pending.frames=self.pending.frames-1

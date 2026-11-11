@@ -12,6 +12,7 @@ import shutil
 import sys
 import time
 import uuid
+from . import __version__
 
 PACKAGE=Path(__file__).resolve().parent
 ROOT=Path(os.environ.get('POB_DIR', '.')).resolve()
@@ -233,7 +234,7 @@ def mcp():
             if method=='initialize':
                 requested=params.get('protocolVersion')
                 supported=('2024-11-05','2025-03-26','2025-06-18','2025-11-25')
-                result={'protocolVersion':requested if requested in supported else supported[-1],'capabilities':{'tools':{}},'serverInfo':{'name':'pob-agent-bridge','version':'0.1.0'}}
+                result={'protocolVersion':requested if requested in supported else supported[-1],'capabilities':{'tools':{}},'serverInfo':{'name':'pob-agent-bridge','version':__version__}}
             elif method=='ping':result={}
             elif method=='tools/list':result={'tools':TOOLS}
             elif method=='tools/call':

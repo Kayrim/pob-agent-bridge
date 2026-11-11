@@ -16,7 +16,7 @@ from pob_bridge import cli as b
 class BridgeTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory(dir=os.environ.get('POB_TEST_TMPDIR'))
-        self.root=Path(self.tmp.name)
+        self.root=Path(self.tmp.name).resolve()
         self.patches=[patch.object(b,'ROOT',self.root),patch.object(b,'RUNTIME',self.root/'agent-bridge/runtime')]
         for p in self.patches:p.start()
     def tearDown(self):

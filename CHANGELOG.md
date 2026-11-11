@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- Canonicalize temporary test roots so Windows runner profiles with 8.3 short
+  path aliases exercise the same path rules as the configured CLI.
+- Keep the MCP server's reported version tied to the Python package version.
+
 ## 0.1.0
 
 - Standalone local MCP server and CLI, with explicit PoB directory configuration.
