@@ -50,7 +50,7 @@ def install() -> dict:
     if MARKER in text and HOOK not in text: raise RuntimeError('Bridge hook differs; refusing to overwrite it')
     if MARKER not in text and text.count(ANCHOR)!=1: raise RuntimeError('PoB frame hook changed; manual compatibility review needed')
     RUNTIME.mkdir(parents=True,exist_ok=True)
-    for name in ('live.lua','calculate.lua'):
+    for name in ('live.lua','calculate.lua','timer.lua'):
         target=ROOT/'agent-bridge'/name
         if target.resolve()!=(PACKAGE/name).resolve():shutil.copy2(PACKAGE/name,target)
     if MARKER in text:
@@ -94,14 +94,23 @@ def request(command: str,args: dict | None=None,timeout=15.0) -> dict:
     if command in ('load','export'):args['path']=workspace_path(args['path']).as_posix()
     with locked(timeout):
         owner=heartbeat()
-        if not owner:raise RuntimeError('No fresh live heartbeat. Install/restart PoB, then keep its window active. Use pob_calculate for unattended work; inspect pob_pending before retrying a timed-out mutation.')
+        if not owner:raise RuntimeError('No fresh live heartbeat. Install/restart PoB to start its background bridge. Check pob_health and pob_pending; never retry a timed-out mutation blindly.')
         previous=pending()
         if previous.get('pending'):raise RuntimeError('A previous request has unknown outcome. Inspect pob_pending and let PoB service it before submitting another request.')
         identity=uuid.uuid4().hex
         req={'id':identity,'pid':owner['pid'],'command':command,'args':args}
         temp=RUNTIME/f'{identity}.tmp'
         temp.write_text(json.dumps(req),encoding='utf-8')
-        temp.replace(RUNTIME/'request.json')
+        # Windows may briefly deny rename while PoB reads the mailbox. The
+        # request is not published yet, so retry only this same atomic rename.
+        publish_deadline=time.monotonic()+min(timeout,1.0)
+        while True:
+            try:
+                temp.replace(RUNTIME/'request.json')
+                break
+            except PermissionError:
+                if time.monotonic()>=publish_deadline:raise
+                time.sleep(.01)
         deadline=time.monotonic()+timeout
         while time.monotonic()<deadline:
             try:reply=json.loads((RUNTIME/'response.json').read_text(encoding='utf-8'))
@@ -163,11 +172,13 @@ def pending() -> dict:
 def health() -> dict:
     try:text=(ROOT/'Launch.lua').read_text(encoding='utf-8')
     except OSError:text=''
+    current=heartbeat()
     return {'pobDirectory':str(ROOT),'validInstallation':bool(text and (ROOT/'lua51.dll').exists()),
-            'hookInstalled':HOOK in text,'liveHeartbeatFresh':heartbeat() is not None,
+            'hookInstalled':HOOK in text,'liveHeartbeatFresh':current is not None,
             'heartbeat':heartbeat(max_age=None),'pending':pending()['pending'],
             'testedPoBVersion':'2.67.2','platform':'Windows x64; Python x64',
-            'advice':'Use pob_calculate without a GUI. Live tools require a foreground PoB window.'}
+            'backgroundService':bool(current and current.get('serviceMode')=='windows-message-timer'),
+            'advice':'Calculations need no GUI. Live tools work while PoB is idle/minimised with the 0.2 background bridge; restart PoB after installing.'}
 
 TOOLS=[
     {'name':'pob_health','description':'Start here: inspect installation, removable hook, fresh GUI heartbeat and pending requests. No running GUI required.','inputSchema':{'type':'object','properties':{},'additionalProperties':False}},

@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.0
+
+- Service live requests with a same-thread Windows message timer while PoB is
+  inactive or minimised, without drawing frames, changing focus or sending input.
+- Finish mode changes and native recalculation before acknowledging load,
+  selection and configuration requests; remove the two-draw-frame dependency.
+- Wait for active Lua UI callbacks, including native modal-dialog loops, before
+  servicing requests. Clean up the timer and private messages on shutdown.
+- Report background-service state and runtime errors. Retry Windows sharing
+  violations only before the request is published, retaining its identity.
+- Add zero-frame and real timer regressions. Eleven tests pass with native
+  checks enabled; live operations also pass through Codex MCP with PoB minimised.
+
+After upgrading, rerun `install` and restart PoB normally once. Preserve open
+work first. The MCP command and eight tool schemas remain compatible.
+
 ## 0.1.2
 
 - Add Codex CLI registration, a copy-paste TOML configuration and real-connection

@@ -36,8 +36,9 @@ Codex users can follow [the Codex-specific walkthrough](CODEX.md).
 1. Call `pob_health`. Resolve an invalid installation before attempting work.
 2. Prefer `pob_calculate` for review/comparison. Its XML path must be inside PoB.
 3. Inspect `pobVersion` and `latestTreeVersion`; do not claim newer game data.
-4. For live work, ensure the hook is installed and restarted, PoB is active and
-   there is no pending request. Call `pob_status` to discover actual set IDs.
+4. For live work, ensure the hook is installed/restarted, PoB is running and
+   `pob_health` reports `backgroundService: true`. It can be inactive/minimised.
+   Ensure there is no pending request; call `pob_status` to discover actual IDs.
 5. Select matching tree/skills/items/configuration together. These are distinct
    IDs, not necessarily identical numbers. Return to `pob_status` after errors.
 6. Export to a new filename, and report the backup/export paths to the user.
@@ -71,6 +72,12 @@ Agents with a terminal can invoke the same CLI. Successful output is JSON;
 command errors return a nonzero exit status. `mcp` reserves stdout for JSON-RPC.
 The subprocess used for native calculation has a 60-second limit. Live requests
 normally time out after 15 seconds. No progress/streaming or task API is exposed.
+
+The 0.2 live service uses a 100-ms Windows message timer on PoB's main thread,
+independent of its draw callback. Load/select/config commands finish their
+native non-drawing lifecycle and calculation before acknowledging. Closing or
+restarting PoB kills the timer and drains its private messages. There is no
+worker thread accessing live Lua state and no simulated user input.
 
 MCP transport reference:
 https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#stdio

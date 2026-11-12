@@ -80,7 +80,7 @@ Try this prompt:
 
 ## Tools
 
-| Tool | Purpose | Needs active GUI? |
+| Tool | Purpose | Needs running GUI? |
 |---|---|---|
 | `pob_health` | Inspect installation, hook, heartbeat and pending request | No |
 | `pob_calculate` | Calculate XML in a separate native-engine process | No |
@@ -106,21 +106,25 @@ hook, then **open PoB using your normal Windows shortcut**:
 
 ```powershell
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" install
-# Open PoB normally, keep its window active, then run:
+# Open PoB normally (it may then be inactive or minimised), then run:
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" status
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" load builds/example.xml
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" select --tree 1 --skills 1 --items 1 --config-set 1 --view CALCS
 pob-agent-bridge --pob-dir "C:/Games/Path of Building" export builds/example-agent-copy.xml
 ```
 
-**Keep the PoB window active for live tools.** PoB's graphics host can stop Lua
-frames while the window is inactive and the mouse is outside it. That pauses the
-mailbox. Use `pob_calculate` for unattended agent work, rather than trying to keep
-the GUI awake. A stale heartbeat does not prove PoB has closed.
+**PoB can stay inactive or minimised.** Version 0.2 uses a private Windows message
+timer on PoB's own thread to service the mailbox every 100 ms. It finishes mode
+changes and recalculates through PoB's non-drawing APIs before replying. It does
+not move the mouse, change focus, force drawing frames or add a network listener.
+`pob_health` reports `backgroundService: true` once the new bridge is running.
+After upgrading, rerun `install` and restart PoB normally once. Old in-memory
+bridge versions still require an active window. `pob_calculate` continues to work
+without a running GUI or an installed hook.
 
 Installation copies bridge Lua files into `agent-bridge/`, saves a hash-named
 original `Launch.lua` under `agent-bridge/runtime/`, and inserts one marked frame
-hook. It does not alter calculation formulas. PoB updates may remove that hook;
+startup hook. It does not alter calculation formulas. PoB updates may remove that hook;
 rerun installation and restart after checking compatibility. If the hook location
 or an existing hook differs, installation refuses to guess.
 
@@ -149,9 +153,10 @@ or assume this error always has the same cause.
 
 ## Timeouts and local access
 
-Live requests are serialized. A timed-out request may still execute when PoB
-becomes active. **Do not blindly retry**: use `pob_pending`, activate PoB and let
-the request finish, then inspect its result. New requests are blocked while a
+Live requests are serialized. A timed-out request may still execute later.
+**Do not blindly retry**: use `pob_pending`, inspect the result and check
+`pob_health` / `agent-bridge/runtime/last-error.json` if servicing has stopped.
+New requests are blocked while a
 previous outcome is unknown. There is no automatic destructive retry/cancel.
 
 The bridge opens **no TCP port**, has no remote listener and needs no API key.
@@ -189,8 +194,11 @@ The suite covers reversible installation, refusal of unknown hooks, path escapes
 argument validation, pending-request preservation, protocol/error responses and,
 when enabled, a real native calculation plus an invalid-tree error over MCP,
 and load/select/config/export handlers exercised against isolated native objects.
+Timer regressions forbid drawing and check both idle operation and deferral
+during nested UI callbacks.
 The packaged bridge was also verified through Codex's actual MCP client: eight
 tools discovered, native calculation, live status, set selection and export.
+The 0.2 background operations passed while the user kept PoB minimised.
 Normal PoB saving was confirmed after reopening the GUI normally. See
 [verification details](docs/VERIFICATION.md). Wider version/build compatibility
 still needs community testing. Do not use calculated max hit as a survival guarantee.

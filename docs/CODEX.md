@@ -6,7 +6,7 @@ For example, from a normal PowerShell terminal after downloading a release:
 
 ```powershell
 python -m venv "C:/Games/Path of Building/agent-bridge/.venv"
-& "C:/Games/Path of Building/agent-bridge/.venv/Scripts/python.exe" -m pip install ./pob_agent_bridge-0.1.2-py3-none-any.whl
+& "C:/Games/Path of Building/agent-bridge/.venv/Scripts/python.exe" -m pip install ./pob_agent_bridge-0.2.0-py3-none-any.whl
 ```
 
 Use your actual writable PoB directory and downloaded wheel location.
@@ -42,12 +42,17 @@ The XML must already exist inside your PoB directory. For a synthetic smoke test
 copy this repository's `examples/minimal.xml` to `builds/example.xml` there.
 The eight tools should be discoverable; `pob_health` and `pob_calculate` work with
 the GUI closed. `pob_status` confirms a **live** connection only when the hooked
-PoB window is running, active, and responds.
+PoB window is running and responds. In 0.2 it may be inactive or minimised;
+`pob_health` should also report `backgroundService: true`.
 
 For live control, install the hook once, then open PoB using your normal Windows
-shortcut. Keep it active and ask Codex for `pob_status`. Read its reported IDs
+shortcut. Ask Codex for `pob_status`. Read its reported IDs
 before selecting matching sets. Set selection does not automatically change the
 character's level. After any mutation, verify the result and save/export as needed.
+
+After updating the Python package, run `install` again to refresh its Lua files
+and restart PoB normally once. Reconnect the MCP client so it uses the updated
+package. Keeping an old PoB process open keeps its old in-memory bridge code.
 
 ## Save-folder errors
 
